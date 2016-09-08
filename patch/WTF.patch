@@ -1,0 +1,55 @@
+diff --git wtf/Assertions.cpp wtf/Assertions.cpp
+index 4f39fb1..bcba312 100644
+--- wtf/Assertions.cpp
++++ wtf/Assertions.cpp
+@@ -78,6 +78,11 @@
+ #include <execinfo.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <cxxabi.h>
++#include <dlfcn.h>
++#endif
++
+ extern "C" {
+ 
+ static void logToStderr(const char* buffer)
+diff --git wtf/DateMath.cpp wtf/DateMath.cpp
+index c992b60..1c421e6 100644
+--- wtf/DateMath.cpp
++++ wtf/DateMath.cpp
+@@ -102,6 +102,19 @@
+ #include <sys/timeb.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <time64.h>
++static time_t timegm(struct tm* const t) {
++    static const time_t kTimeMax = ~(1L << (sizeof(time_t) * 8 - 1));
++    static const time_t kTimeMin = (1L << (sizeof(time_t) * 8 - 1));
++    time64_t result = timegm64(t);
++    if (result < kTimeMin || result > kTimeMax) {
++        return -1;
++    }
++    return result;
++}
++#endif
++
+ using namespace WTF;
+ 
+ namespace WTF {
+diff --git wtf/ThreadIdentifierDataPthreads.cpp wtf/ThreadIdentifierDataPthreads.cpp
+index 1528dad..e9c8e4a 100644
+--- wtf/ThreadIdentifierDataPthreads.cpp
++++ wtf/ThreadIdentifierDataPthreads.cpp
+@@ -43,6 +43,10 @@
+ #include <limits.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#define PTHREAD_KEYS_MAX 1024
++#endif
++
+ namespace WTF {
+ 
+ pthread_key_t ThreadIdentifierData::m_key = PTHREAD_KEYS_MAX;

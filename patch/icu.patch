@@ -1,0 +1,56 @@
+diff --git common/Android.mk common/Android.mk
+index 00761ea..01ed13c 100644
+--- common/Android.mk
++++ common/Android.mk
+@@ -145,15 +145,15 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES += $(src_files)
+ LOCAL_C_INCLUDES += $(c_includes)
+ LOCAL_CFLAGS += $(local_cflags) -DPIC -fPIC
++LOCAL_CPPFLAGS += -std=gnu++03
+ LOCAL_SHARED_LIBRARIES += libdl
+-LOCAL_LDLIBS += $(local_ldlibs)
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE := libicuuc
+ LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Android.mk
+ LOCAL_REQUIRED_MODULES += icu-data
+-include abi/cpp/use_rtti.mk
+-include external/stlport/libstlport.mk
+-include $(BUILD_SHARED_LIBRARY)
++LOCAL_CPP_FEATURES += rtti
++LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/../../../gen/icu/include/icuuc
++include $(BUILD_STATIC_LIBRARY)
+ 
+ 
+ #
+diff --git i18n/Android.mk i18n/Android.mk
+index a9b7948..85749d6 100644
+--- i18n/Android.mk
++++ i18n/Android.mk
+@@ -81,7 +81,7 @@ src_files += \
+         vzone.cpp       fphdlimp.cpp fpositer.cpp\
+         locdspnm.cpp    ucol_wgt.cpp \
+         alphaindex.cpp  bocsu.cpp    decfmtst.cpp \
+-        smpdtfst.cpp    smpdtfst.h   tzfmt.cpp \
++        smpdtfst.cpp                 tzfmt.cpp \
+         tzgnames.cpp    tznames.cpp  tznames_impl.cpp \
+         udateintervalformat.cpp  upluralrules.cpp
+ 
+@@ -105,14 +105,14 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES += $(src_files)
+ LOCAL_C_INCLUDES += $(c_includes)
+ LOCAL_CFLAGS += $(local_cflags) -DPIC -fPIC
++LOCAL_CPPFLAGS += -std=gnu++03
+ LOCAL_SHARED_LIBRARIES += libicuuc
+-LOCAL_LDLIBS += $(local_ldlibs)
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE := libicui18n
+ LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Android.mk
+-include abi/cpp/use_rtti.mk
+-include external/stlport/libstlport.mk
+-include $(BUILD_SHARED_LIBRARY)
++LOCAL_CPP_FEATURES += rtti
++LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/../../../gen/icu/include/icui18n
++include $(BUILD_STATIC_LIBRARY)
+ 
+ 
+ #

@@ -1,0 +1,6 @@
+.DS_Store
+/dep/*
+!.keep
+/gen
+/obj
+/libs

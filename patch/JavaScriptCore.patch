@@ -1,0 +1,65 @@
+diff --git inspector/JSGlobalObjectInspectorController.cpp inspector/JSGlobalObjectInspectorController.cpp
+index 16ddf55..7ca4c36 100644
+--- inspector/JSGlobalObjectInspectorController.cpp
++++ inspector/JSGlobalObjectInspectorController.cpp
+@@ -49,7 +49,7 @@
+ #include "ScriptCallStackFactory.h"
+ #include <wtf/Stopwatch.h>
+ 
+-#if OS(DARWIN) || (OS(LINUX) && !PLATFORM(GTK))
++#if OS(DARWIN) || (OS(LINUX) && !PLATFORM(GTK) && !defined(__ANDROID__))
+ #include <cxxabi.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>
+@@ -187,7 +187,7 @@ void JSGlobalObjectInspectorController::pause()
+ 
+ void JSGlobalObjectInspectorController::appendAPIBacktrace(ScriptCallStack* callStack)
+ {
+-#if OS(DARWIN) || (OS(LINUX) && !PLATFORM(GTK))
++#if OS(DARWIN) || (OS(LINUX) && !PLATFORM(GTK) && !defined(__ANDROID__))
+     static const int framesToShow = 31;
+     static const int framesToSkip = 3; // WTFGetBacktrace, appendAPIBacktrace, reportAPIException.
+ 
+diff --git runtime/DatePrototype.cpp runtime/DatePrototype.cpp
+index 5ef4e72..6724fbe 100644
+--- runtime/DatePrototype.cpp
++++ runtime/DatePrototype.cpp
+@@ -44,7 +44,7 @@
+ #include <wtf/MathExtras.h>
+ #include <wtf/StringExtras.h>
+ 
+-#if HAVE(LANGINFO_H)
++#if HAVE(LANGINFO_H) && !defined(__ANDROID__)
+ #include <langinfo.h>
+ #endif
+ 
+diff --git runtime/JSObjectInlines.h runtime/JSObjectInlines.h
+index 1a7e823..08434f3 100644
+--- runtime/JSObjectInlines.h
++++ runtime/JSObjectInlines.h
+@@ -45,7 +45,7 @@ void createListFromArrayLike(ExecState* exec, JSValue arrayLikeValue, RuntimeTyp
+     double lengthAsDouble = lengthProperty.toLength(exec);
+     if (UNLIKELY(scope.exception()))
+         return;
+-    RELEASE_ASSERT(lengthAsDouble >= 0.0 && lengthAsDouble == std::trunc(lengthAsDouble));
++    RELEASE_ASSERT(lengthAsDouble >= 0.0 && lengthAsDouble == trunc(lengthAsDouble));
+     uint64_t length = static_cast<uint64_t>(lengthAsDouble);
+     for (uint64_t index = 0; index < length; index++) {
+         JSValue next = arrayLikeValue.get(exec, index);
+diff --git runtime/MathObject.cpp runtime/MathObject.cpp
+index 3db16f8..63644c0 100644
+--- runtime/MathObject.cpp
++++ runtime/MathObject.cpp
+@@ -30,6 +30,12 @@
+ #include <wtf/MathExtras.h>
+ #include <wtf/Vector.h>
+ 
++#ifdef __ANDROID__
++static double log2(double x) {
++    return log(x) / log(2.0);
++}
++#endif
++
+ namespace JSC {
+ 
+ STATIC_ASSERT_IS_TRIVIALLY_DESTRUCTIBLE(MathObject);
